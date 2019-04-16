@@ -11,6 +11,7 @@ import requests
 from flask import current_app
 import logging
 import time
+from app.libs.utils import loads_jsonp
 
 
 class Music(object):
@@ -55,3 +56,15 @@ class Music(object):
         self.payload['n'] = count if count <= 20 else 20  # max 20
         res = requests.get(url, params=self.payload, headers=self.headers)
         return res.json()
+
+    def _lyric(self, id):
+        """获取歌词"""
+        url = "{}/lyric/fcgi-bin/fcg_query_lyric.fcg".format(self.base_url)
+        config = dict(
+            musicid=id,
+            nobase64=0,
+            jsonpCallback='jsonp1'
+        )
+        self.payload.update(config)
+        res = requests.get(url, params=self.payload, headers=self.headers)
+        return loads_jsonp(res.text)

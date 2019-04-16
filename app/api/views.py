@@ -12,7 +12,7 @@ from app.api import music_api
 from app import music_cache
 import logging
 from app.libs.music import Music
-from app.libs.utils import json_formatter
+from app.libs.utils import json_formatter, decode_bs64
 
 
 @music_api.route('')
@@ -93,12 +93,27 @@ def search_song(keyword):
                 singer=[{'id': i['id'], 'mid': i['mid'], 'name': i['name']} for i in m['singer']],
                 songname=m['songname'],
                 songmid=m['songmid'],
+                songid=m['songid'],
             ))
     except Exception as e:
         logging.error(e)
         return json_formatter(code=500)
     music_search = json_formatter(dict(total=total, song=all_song))
     return jsonify(music_search)
+
+
+@music_api.route('/lyric/<string:id>')
+@music_cache.cached()
+def song_lyric(id):
+    logging.debug('获取歌词')
+    music = Music()
+    try:
+        lyc = decode_bs64(music._lyric(id)['lyric'])
+    except Exception as e:
+        logging.error(e)
+        return json_formatter(code=500)
+    music_lyc = json_formatter(dict(songid=id, lyric=lyc))
+    return jsonify(music_lyc)
 
 
 @music_cache.cached()

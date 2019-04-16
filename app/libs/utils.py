@@ -7,6 +7,10 @@
 Less is more.
 """
 
+import json
+import re
+import base64
+
 
 def json_formatter(data=None, code=0):
     """加工返回数据"""
@@ -17,3 +21,19 @@ def json_formatter(data=None, code=0):
         announce=announce,
         data=data,
     )
+
+
+def loads_jsonp(jsonp_data):
+    """解析jsonp数据格式为json"""
+    try:
+        return json.loads(re.match(".*?({.*}).*", jsonp_data, re.S).group(1))
+    except:
+        raise ValueError('Invalid Input')
+
+
+def decode_bs64(bs64_data):
+    """解密base64"""
+    try:
+        return base64.b64decode(bs64_data.encode('utf-8')).decode('utf-8')
+    except:
+        raise ValueError('Invalid Input')
