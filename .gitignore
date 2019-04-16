@@ -1,0 +1,5 @@
+.idea/
+secure.py
+tests/
+__pycache__/
+.env

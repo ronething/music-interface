@@ -1,0 +1,19 @@
+[[source]]
+name = "pypi"
+url = "https://mirrors.ustc.edu.cn/pypi/web/simple/"
+verify_ssl = true
+
+[dev-packages]
+pylint = "*"
+jupyter = "*"
+
+[packages]
+flask = "*"
+requests = "*"
+flask-caching = "*"
+flask-cors = "*"
+python-dotenv = "*"
+redis = "*"
+
+[requires]
+python_version = "3.6"
