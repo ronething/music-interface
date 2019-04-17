@@ -10,6 +10,11 @@ Less is more.
 import json
 import re
 import base64
+from contextlib import contextmanager
+import logging
+import traceback
+
+from app.libs.exc import APIException
 
 
 def json_formatter(data=None, code=0):
@@ -37,3 +42,12 @@ def decode_bs64(bs64_data):
         return base64.b64decode(bs64_data.encode('utf-8')).decode('utf-8')
     except:
         raise ValueError('Invalid Input')
+
+
+@contextmanager
+def auto_logging():
+    try:
+        yield
+    except:
+        logging.error(traceback.format_exc())
+        raise APIException()

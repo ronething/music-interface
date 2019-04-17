@@ -36,6 +36,13 @@ class Music(object):
         res = requests.get(url, params=self.payload, headers=self.headers)
         return res.json()
 
+    def _top_list_songs(self, id):
+        """排行榜中列表歌曲"""
+        url = "{}/v8/fcg-bin/fcg_v8_toplist_cp.fcg".format(self.base_url)
+        self.payload['topid'] = id
+        res = requests.get(url, params=self.payload, headers=self.headers)
+        return res.json()
+
     def _hot_keys(self):
         """热门搜索关键字"""
         url = "{}/splcloud/fcgi-bin/gethotkey.fcg".format(self.base_url)

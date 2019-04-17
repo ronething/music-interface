@@ -12,7 +12,7 @@ from app.api import music_api
 from app import music_cache
 import logging
 from app.libs.music import Music
-from app.libs.utils import json_formatter, decode_bs64
+from app.libs.utils import json_formatter, decode_bs64, auto_logging
 
 
 @music_api.route('')
@@ -25,11 +25,8 @@ def home():
 @music_api.route('/slider')
 def slider():
     logging.debug('首页轮播图')
-    try:
+    with auto_logging():
         slider = get_recommend()['data']['slider']
-    except Exception as e:
-        logging.error(e)
-        return json_formatter(code=500)
     music_slider = json_formatter(slider)
     return jsonify(music_slider)
 
@@ -37,11 +34,8 @@ def slider():
 @music_api.route('/hot')
 def hot_list():
     logging.debug('热门歌单')
-    try:
+    with auto_logging():
         hot = get_recommend()['data']['songList']
-    except Exception as e:
-        logging.error(e)
-        return json_formatter(code=500)
     music_hot = json_formatter(hot)
     return jsonify(music_hot)
 
@@ -51,13 +45,32 @@ def hot_list():
 def top_list():
     logging.debug('排行榜')
     music = Music()
-    try:
+    with auto_logging():
         top = music._top_list()['data']['topList']
-    except Exception as e:
-        logging.error(e)
-        return json_formatter(code=500)
     music_top = json_formatter(top)
     return jsonify(music_top)
+
+
+@music_api.route('/top/<int:topid>')
+@music_cache.cached(timeout=3600 * 4)
+def top_list_songs(topid):
+    logging.debug('排行榜歌曲')
+    music = Music()
+    with auto_logging():
+        top_res = music._top_list_songs(topid)
+        total = top_res['total_song_num']
+        _top_info = top_res['topinfo']
+        top_info = dict(
+            name=_top_info['ListName'],
+            info=_top_info['info'],
+            pic=_top_info['pic_album'],
+        )
+        logging.debug(top_info)
+        update_time = top_res['update_time']
+        all_song = get_songlist(top_res['songlist'])
+    music_top_list_songs = json_formatter(dict(total=total, top_info=top_info,
+                                               update_time=update_time, all_song=all_song))
+    return jsonify(music_top_list_songs)
 
 
 @music_api.route('/hotkeys')
@@ -65,11 +78,8 @@ def top_list():
 def hot_keys():
     logging.debug('热门搜索')
     music = Music()
-    try:
+    with auto_logging():
         keys = music._hot_keys()['data']
-    except Exception as e:
-        logging.error(e)
-        return json_formatter(code=500)
     music_hot_keys = json_formatter(keys)
     return jsonify(music_hot_keys)
 
@@ -79,25 +89,12 @@ def hot_keys():
 def search_song(keyword):
     logging.debug('搜索歌曲')
     music = Music()
-    try:
+    with auto_logging():
         page = int(request.args.get('page', 1))
         count = int(request.args.get('count', 20))
         search = music._search(keyword, page, count)['data']['song']
         total = search['totalnum']
-        all_song = []
-        for m in search['list']:
-            all_song.append(dict(
-                albumid=m['albumid'],
-                albummid=m['albummid'],
-                albumname=m['albumname'],
-                singer=[{'id': i['id'], 'mid': i['mid'], 'name': i['name']} for i in m['singer']],
-                songname=m['songname'],
-                songmid=m['songmid'],
-                songid=m['songid'],
-            ))
-    except Exception as e:
-        logging.error(e)
-        return json_formatter(code=500)
+        all_song = get_songlist(search['list'])
     music_search = json_formatter(dict(total=total, song=all_song))
     return jsonify(music_search)
 
@@ -107,11 +104,8 @@ def search_song(keyword):
 def song_lyric(id):
     logging.debug('获取歌词')
     music = Music()
-    try:
+    with auto_logging():
         lyc = decode_bs64(music._lyric(id)['lyric'])
-    except Exception as e:
-        logging.error(e)
-        return json_formatter(code=500)
     music_lyc = json_formatter(dict(songid=id, lyric=lyc))
     return jsonify(music_lyc)
 
@@ -120,5 +114,34 @@ def song_lyric(id):
 def get_recommend():
     logging.debug('首页推荐条目')
     music = Music()
-    res = music._recommend()
+    with auto_logging():
+        res = music._recommend()
     return res
+
+
+def get_songlist(data):
+    """解析歌曲列表数据"""
+    all_song = []
+    for m in data:
+        if m.get('data') is None:
+            all_song.append(dict(
+                albumid=m['albumid'],
+                albummid=m['albummid'],
+                albumname=m['albumname'],
+                singer=[{'id': i['id'], 'mid': i['mid'], 'name': i['name']} for i in m['singer']],
+                songname=m['songname'],
+                songmid=m['songmid'],
+                songid=m['songid'],
+            ))
+        else:
+            m = m['data']
+            all_song.append(dict(
+                albumid=m['albumid'],
+                albummid=m['albummid'],
+                albumname=m['albumname'],
+                singer=[{'id': i['id'], 'mid': i['mid'], 'name': i['name']} for i in m['singer']],
+                songname=m['songname'],
+                songmid=m['songmid'],
+                songid=m['songid'],
+            ))
+    return all_song
