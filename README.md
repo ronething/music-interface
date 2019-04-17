@@ -32,7 +32,13 @@ pipenv run python manage.py
 
 ## Deployment
 
-- 暂时未部署 菜🐔
+- ~~暂时未部署 菜🐔~~
+- 部署参考 [mp-music](https://github.com/ronething/mp-music)
+
+## DEMO SITE
+
+- 演示站点 [m.ronething.com](m.ronething.com/v3/api)
+- ⚠️ 学生机一台经不起折腾 仅作为演示站点 随时关闭。
 
 ## API DOC
 
