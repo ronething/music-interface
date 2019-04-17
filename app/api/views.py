@@ -121,6 +121,28 @@ def song_lyric(id):
     return jsonify(music_lyc)
 
 
+@music_api.route('/singer/pic/<string:mid>')
+@music_cache.cached(timeout=3600 * 12)
+def singer_ava(mid):
+    logging.debug('获取歌手头像')
+    music = Music()
+    with auto_logging():
+        res = music._singer_avatar(mid)
+    singer_avatar = json_formatter(res)
+    return jsonify(singer_avatar)
+
+
+@music_api.route('/album/pic/<string:mid>')
+@music_cache.cached(timeout=3600 * 12)
+def album_ava(mid):
+    logging.debug('获取专辑封面')
+    music = Music()
+    with auto_logging():
+        res = music._album_pic(mid)
+    album_pic = json_formatter(res)
+    return jsonify(album_pic)
+
+
 @music_cache.cached()
 def get_recommend():
     logging.debug('首页推荐条目')

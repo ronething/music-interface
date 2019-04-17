@@ -75,3 +75,16 @@ class Music(object):
         self.payload.update(config)
         res = requests.get(url, params=self.payload, headers=self.headers)
         return loads_jsonp(res.text)
+
+    def _singer_track(self):
+        pass
+
+    def _singer_avatar(self, mid):
+        """歌手头像"""
+        url = current_app.config['SINGER_AVATAR_BASE_URL'].format(mid)
+        return url
+
+    def _album_pic(self, mid):
+        """专辑封面"""
+        url = current_app.config['ALBUM_BASE_URL'].format(mid)
+        return url

@@ -55,3 +55,7 @@ DF_HEADERS = {
 QQ_MUSIC_COMMON_BASE_URL = 'https://c.y.qq.com'
 
 ERROR_OK = 0
+
+SINGER_AVATAR_BASE_URL = "https://y.gtimg.cn/music/photo_new/T001R300x300M000{}.jpg?max_age=2592000"
+ALBUM_BASE_URL = "https://y.gtimg.cn/music/photo_new/T002R300x300M000{}.jpg?max_age=2592000"
+
