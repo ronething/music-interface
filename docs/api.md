@@ -322,7 +322,7 @@
 
 `v3/api/songs/url`
 
-- 参数说明 `?songsmid=aa,bbb` 使用英文逗号隔开
+- 参数说明 `?songsmid=aa,bbb` 使用英文逗号隔开 ⚠️ 是 songmid 不是 songid
 
 ```json
 // 20190418000828
