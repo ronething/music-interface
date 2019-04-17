@@ -143,6 +143,19 @@ def album_ava(mid):
     return jsonify(album_pic)
 
 
+@music_api.route('/songs/url')
+@music_cache.cached(timeout=60, query_string=True)
+def songs_url():
+    logging.debug('获取歌曲url')
+    music = Music()
+    with auto_logging():
+        mids = request.args.get('songsmid', None)
+        if mids is None: return APIException()
+        res = music._songs_urls(mids)
+    songs_meta = json_formatter(res)
+    return jsonify(songs_meta)
+
+
 @music_cache.cached()
 def get_recommend():
     logging.debug('首页推荐条目')

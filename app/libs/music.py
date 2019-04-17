@@ -6,11 +6,14 @@
 
 Less is more.
 """
+import random
 
 import requests
 from flask import current_app
 import logging
 import time
+
+from app.libs.exc import APIException
 from app.libs.utils import loads_jsonp
 
 
@@ -88,3 +91,24 @@ class Music(object):
         """专辑封面"""
         url = current_app.config['ALBUM_BASE_URL'].format(mid)
         return url
+
+    def _songs_urls(self, mids):
+        """获取歌曲url"""
+        guid = str(random.randrange(1000000000, 10000000000))
+        params = {"guid": guid, "format": "json", "json": 3}
+        s = requests.Session()
+        s.headers.update(self.headers)
+        r = s.get("http://base.music.qq.com/fcgi-bin/fcg_musicexpress.fcg", params=params)
+        if r.status_code != requests.codes.ok:
+            raise APIException()
+        j = r.json()
+        if j["code"] != current_app.config['ERROR_OK']:
+            raise APIException()
+        vkey = j["key"]
+        # "M800", "M500", "C400"
+        urls = []
+        for mid in mids.split(','):
+            url1 = "http://dl.stream.qqmusic.qq.com/M500%s.mp3?vkey=%s&guid=%s&fromtag=1" % (mid, vkey, guid)
+            url2 = "http://dl.stream.qqmusic.qq.com/C400%s.m4a?vkey=%s&guid=%s&fromtag=1" % (mid, vkey, guid)
+            urls.append({mid: [url1, url2]})
+        return urls
