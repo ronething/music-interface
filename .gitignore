@@ -3,3 +3,5 @@ secure.py
 tests/
 __pycache__/
 .env
+cache/
+.DS_Store

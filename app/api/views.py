@@ -162,7 +162,7 @@ def get_recommend():
     music = Music()
     with auto_logging():
         res = music._recommend()
-        logging.error(res)
+        logging.debug(res)
         if res['code'] != current_app.config['ERROR_OK']: raise APIException()
     return res
 
