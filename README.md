@@ -37,7 +37,7 @@ pipenv run python manage.py
 
 ## DEMO SITE
 
-- 演示站点 [m.ronething.com](m.ronething.com/v3/api)
+- 演示站点 [m.ronething.com](http://m.ronething.com/v3/api)
 - ⚠️ 学生机一台经不起折腾 仅作为演示站点 随时关闭。
 
 ## API DOC
