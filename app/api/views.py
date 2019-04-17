@@ -6,11 +6,13 @@
 
 Less is more.
 """
-from flask import jsonify, request
+from flask import jsonify, request, current_app
 
 from app.api import music_api
 from app import music_cache
 import logging
+
+from app.libs.exc import APIException
 from app.libs.music import Music
 from app.libs.utils import json_formatter, decode_bs64, auto_logging
 
@@ -46,7 +48,9 @@ def top_list():
     logging.debug('排行榜')
     music = Music()
     with auto_logging():
-        top = music._top_list()['data']['topList']
+        res = music._top_list()
+        if res['code'] != current_app.config['ERROR_OK']: raise APIException()
+        top = res['data']['topList']
     music_top = json_formatter(top)
     return jsonify(music_top)
 
@@ -58,6 +62,7 @@ def top_list_songs(topid):
     music = Music()
     with auto_logging():
         top_res = music._top_list_songs(topid)
+        if top_res['code'] != current_app.config['ERROR_OK']: raise APIException()
         total = top_res['total_song_num']
         _top_info = top_res['topinfo']
         top_info = dict(
@@ -79,7 +84,9 @@ def hot_keys():
     logging.debug('热门搜索')
     music = Music()
     with auto_logging():
-        keys = music._hot_keys()['data']
+        res = music._hot_keys()
+        if res['code'] != current_app.config['ERROR_OK']: raise APIException()
+        keys = res['data']
     music_hot_keys = json_formatter(keys)
     return jsonify(music_hot_keys)
 
@@ -92,7 +99,9 @@ def search_song(keyword):
     with auto_logging():
         page = int(request.args.get('page', 1))
         count = int(request.args.get('count', 20))
-        search = music._search(keyword, page, count)['data']['song']
+        res = music._search(keyword, page, count)
+        if res['code'] != current_app.config['ERROR_OK']: raise APIException()
+        search = res['data']['song']
         total = search['totalnum']
         all_song = get_songlist(search['list'])
     music_search = json_formatter(dict(total=total, song=all_song))
@@ -105,7 +114,9 @@ def song_lyric(id):
     logging.debug('获取歌词')
     music = Music()
     with auto_logging():
-        lyc = decode_bs64(music._lyric(id)['lyric'])
+        res = music._lyric(id)
+        if res['code'] != current_app.config['ERROR_OK']: raise APIException()
+        lyc = decode_bs64(res['lyric'])
     music_lyc = json_formatter(dict(songid=id, lyric=lyc))
     return jsonify(music_lyc)
 
@@ -116,6 +127,8 @@ def get_recommend():
     music = Music()
     with auto_logging():
         res = music._recommend()
+        logging.error(res)
+        if res['code'] != current_app.config['ERROR_OK']: raise APIException()
     return res
 
 

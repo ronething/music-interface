@@ -53,3 +53,5 @@ DF_HEADERS = {
 }
 
 QQ_MUSIC_COMMON_BASE_URL = 'https://c.y.qq.com'
+
+ERROR_OK = 0
