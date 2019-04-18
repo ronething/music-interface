@@ -171,25 +171,15 @@ def get_songlist(data):
     """解析歌曲列表数据"""
     all_song = []
     for m in data:
-        if m.get('data') is None:
-            all_song.append(dict(
-                albumid=m['albumid'],
-                albummid=m['albummid'],
-                albumname=m['albumname'],
-                singer=[{'id': i['id'], 'mid': i['mid'], 'name': i['name']} for i in m['singer']],
-                songname=m['songname'],
-                songmid=m['songmid'],
-                songid=m['songid'],
-            ))
-        else:
-            m = m['data']
-            all_song.append(dict(
-                albumid=m['albumid'],
-                albummid=m['albummid'],
-                albumname=m['albumname'],
-                singer=[{'id': i['id'], 'mid': i['mid'], 'name': i['name']} for i in m['singer']],
-                songname=m['songname'],
-                songmid=m['songmid'],
-                songid=m['songid'],
-            ))
+        # toplist 的 songlist 每个元素中有 data 但是 search 就没有 所以做一下判断
+        if m.get('data') is not None: m = m['data']
+        all_song.append(dict(
+            albumid=m['albumid'],
+            albummid=m['albummid'],
+            albumname=m['albumname'],
+            singer=[{'id': i['id'], 'mid': i['mid'], 'name': i['name']} for i in m['singer']],
+            songname=m['songname'],
+            songmid=m['songmid'],
+            songid=m['songid'],
+        ))
     return all_song
