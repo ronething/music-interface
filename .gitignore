@@ -5,3 +5,6 @@ __pycache__/
 .env
 cache/
 .DS_Store
+
+*.swp
+.ropeproject/
